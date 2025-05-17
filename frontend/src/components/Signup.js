@@ -6,28 +6,16 @@ import { Link, useNavigate } from 'react-router-dom'; // Import Link and useNavi
 const registerUser = async (name, email, password) => {
   console.log('Attempting to register with:', { name, email, password });
   // Replace with your actual API call
-  // Example:
-  // const response = await fetch('/api/register', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ name, email, password }),
-  // });
-  // if (!response.ok) {
-  //   const errorData = await response.json();
-  //   throw new Error(errorData.message || 'Registration failed');
-  // }
-  // return response.json();
-
-  // Simulate API call
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (email === "existing@example.com") {
-        reject(new Error("Email already exists."));
-      } else {
-        resolve({ success: true, message: "Registration successful! Please login." });
-      }
-    }, 1000);
+  const response = await fetch('http://localhost:5000/signup', { // Assuming your Flask backend is running on port 5000
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ full_name: name, email: email, password: password }),
   });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || errorData.error || 'Registration failed');
+  }
+  return response.json();
 };
 
 
@@ -118,7 +106,7 @@ const Signup = () => {
             </div>
           </div>
 
-          <div>
+          <div> {/* Changed from <div></div> */}
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
             </label>
@@ -162,7 +150,7 @@ const Signup = () => {
             </div>
           </div>
 
-          <div>
+          <div> {/* Changed from <div></div> */}
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Confirm Password
             </label>
@@ -195,7 +183,7 @@ const Signup = () => {
           </div>
         </form>
 
-        <p className="mt-8 text-center text-sm text-gray-500">
+        <p className="mt-8 text-center text-sm text-gray-500"> {/* Corrected paragraph structure */}
           Already have an account?{' '}
           <Link to="/login" className="font-medium text-purple-600 hover:text-pink-500 transition-colors">
             Log in

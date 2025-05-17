@@ -1,75 +1,63 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
-from dotenv import load_dotenv
-from database import init_db
-from routes import register_routes
-import logging
-import sys
-from datetime import timedelta
+from database.db import create_database_tables, SessionLocal, User
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler('app.log')
-    ]
-)
+app = Flask(__name__)
+CORS(app) # Enable CORS for all routes
 
-# Load environment variables from .env file
-load_dotenv()
+@app.route('/')
+def index():
+    return jsonify({"message": "FRS Backend API is running!"})
 
-def create_app():
-    """Create and configure the Flask application"""
-    app = Flask(__name__)
-    
-    # Enhanced CORS configuration
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True
-        }
-    })
-    
-    # JWT Configuration
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key')
-    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
-    
+@app.route('/users', methods=['GET'])
+def get_users():
+    db_session = SessionLocal()
     try:
-        # Initialize the database
-        logging.info("Initializing database...")
-        init_db(app)
-        logging.info("Database initialization complete")
-        
-        # Register routes
-        register_routes(app)
-        logging.info("Routes registered")
-        
+        return jsonify({"message": "User endpoint placeholder. Implement your query."})
     except Exception as e:
-        logging.error(f"Application setup failed: {str(e)}")
-        sys.exit(1)
-    
-    @app.route('/api/health-check')
-    def health_check():
-        return {
-            'status': 'healthy',
-            'message': 'Face Recognition System API is running!',
-            'services': {
-                'database': 'connected',
-                'qdrant': 'initialized' if os.environ.get('QDRANT_HOST') else 'not configured'
-            }
-        }, 200
-    
-    return app
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db_session.close()
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    db_session = SessionLocal()
+    try:
+
+        new_user = User(
+            full_name=data.get('full_name'),
+            email=data.get('email'),
+            password_hash=data.get('password')
+        )
+        db_session.add(new_user)
+        db_session.commit()
+        return jsonify({"message": "User created successfully", "user_id": new_user.user_id}), 201
+    except Exception as e:
+        db_session.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db_session.close()
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    db_session = SessionLocal()
+    try:
+        user = db_session.query(User).filter(User.email == email).first()
+        if user and user.password_hash == password: # In a real app, compare hashed passwords
+            return jsonify({"message": "Login successful", "user_id": user.user_id}), 200
+        else:
+            return jsonify({"message": "Invalid email or password"}), 401
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db_session.close()
 
 if __name__ == '__main__':
-    print("Starting Face Recognition System backend...")
-    app = create_app()
-    print(f"Server is running on http://0.0.0.0:5000")
-    app.run(debug=os.environ.get('FLASK_DEBUG', 'True') == 'True', 
-            host='0.0.0.0', 
-            port=int(os.environ.get('PORT', 5000)))
+    print("Initializing database and creating tables if they don't exist...")
+    create_database_tables()  # Call the function from your db.py
+    print("Starting Flask development server...")
+    app.run(debug=True, port=5000) # Flask default port is 5000

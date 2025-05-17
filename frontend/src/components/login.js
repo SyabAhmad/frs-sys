@@ -1,32 +1,22 @@
 import React, { useState } from 'react';
 import { FaEnvelope, FaLock, FaGoogle } from 'react-icons/fa'; // Using react-icons
+import { Link, useNavigate } from 'react-router-dom'; // Import for navigation
 
-// Placeholder for API call
+// API call to login user
 const loginUser = async (email, password) => {
-  console.log('Attempting to login with:', { email, password });
-  // Replace with your actual API call
-  // Example:
-  // const response = await fetch('/api/login', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ email, password }),
-  // });
-  // if (!response.ok) {
-  //   const errorData = await response.json();
-  //   throw new Error(errorData.message || 'Login failed');
-  // }
-  // return response.json();
-
-  // Simulate API call
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (email === "test@example.com" && password === "password") {
-        resolve({ success: true, message: "Login successful!", token: "fake-jwt-token" });
-      } else {
-        reject(new Error("Invalid email or password."));
-      }
-    }, 1000);
+  console.log('Attempting to login with:', { email });
+  // Real API call to backend
+  const response = await fetch('http://localhost:5000/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
   });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || errorData.error || 'Login failed');
+  }
+  return response.json();
 };
 
 const Login = () => {
@@ -35,6 +25,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleMessage, setGoogleMessage] = useState('');
+  const navigate = useNavigate(); // For redirection after login
 
   const handleEmailLogin = async (e) => {
     e.preventDefault();
@@ -44,8 +35,16 @@ const Login = () => {
     try {
       const data = await loginUser(email, password);
       console.log('Login successful:', data);
-      // Handle successful login (e.g., redirect, store token)
-      alert(data.message); // Replace with actual success handling
+      
+      // Store user data in localStorage or state management solution
+      localStorage.setItem('user', JSON.stringify({
+        userId: data.user_id,
+        token: data.token || 'dummy-token', // If your backend returns a token
+        isAuthenticated: true
+      }));
+      
+      // Redirect to dashboard or home page
+      navigate('/dashboard'); // Change to your app's post-login route
     } catch (err) {
       setError(err.message || 'Failed to login. Please try again.');
     } finally {
@@ -164,9 +163,9 @@ const Login = () => {
 
         <p className="mt-8 text-center text-sm text-gray-500">
           Don't have an account?{' '}
-          <a href="/signup" className="font-medium text-purple-600 hover:text-pink-500 transition-colors">
+          <Link to="/signup" className="font-medium text-purple-600 hover:text-pink-500 transition-colors">
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>
