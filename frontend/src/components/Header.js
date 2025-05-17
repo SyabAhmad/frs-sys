@@ -29,6 +29,16 @@ const Header = ({ scrollToSection, navigateTo }) => { // Added navigateTo prop
     }
   };
 
+  const handleHomeNavigation = (e) => {
+    e.preventDefault(); // Prevent default anchor action
+    if (navigateTo) {
+      navigateTo('/'); // Navigate to home page
+    }
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+    }
+  };
+
   const handleLoginNavigation = (e) => {
     e.preventDefault(); // Prevent default anchor action
     if (navigateTo) {
@@ -59,10 +69,13 @@ const Header = ({ scrollToSection, navigateTo }) => { // Added navigateTo prop
           {/* Title */}
           <div 
             className="text-2xl md:text-3xl font-bold text-white cursor-pointer"
-            onClick={(e) => handleNavClick(e, 'hero')}
+            onClick={handleHomeNavigation}
           >
             <i className="fas fa-face-recognition mr-2"></i>
-            Face Recognition
+            
+            <a href="/" onClick={handleHomeNavigation} className="text-pink-100 hover:text-white transition duration-300">
+              Face Recognition
+            </a>
           </div>
 
           {/* Navigation Links - Desktop */}

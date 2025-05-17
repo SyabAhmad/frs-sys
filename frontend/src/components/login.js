@@ -59,27 +59,27 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-pink-500 p-4">
-      <div className="bg-white p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-500 hover:scale-105">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-purple-700 mb-2">
-            Welcome Back!
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Sign In
           </h1>
-          <p className="text-gray-600">Please login to access your account.</p>
+          <p className="text-gray-600 text-sm mt-1">Please enter your credentials</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-lg text-sm">
+          <div className="mb-4 p-3 bg-red-50 text-red-700 border-l-4 border-red-500 rounded text-sm">
             {error}
           </div>
         )}
         {googleMessage && (
-          <div className="mb-4 p-3 bg-blue-100 text-blue-700 border border-blue-300 rounded-lg text-sm">
+          <div className="mb-4 p-3 bg-blue-50 text-blue-700 border-l-4 border-blue-500 rounded text-sm">
             {googleMessage}
           </div>
         )}
 
-        <form onSubmit={handleEmailLogin} className="space-y-6">
+        <form onSubmit={handleEmailLogin} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
@@ -96,7 +96,7 @@ const Login = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="you@example.com"
               />
             </div>
@@ -118,24 +118,24 @@ const Login = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="••••••••"
               />
             </div>
             <div className="text-right mt-2">
-              <a href="#" className="text-sm text-purple-600 hover:text-pink-500 transition-colors">
+              <a href="#" className="text-sm text-blue-600 hover:text-blue-500">
                 Forgot password?
               </a>
             </div>
           </div>
 
-          <div>
+          <div className="pt-2">
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-medium text-white bg-purple-600 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-all duration-300 ease-in-out disabled:opacity-50"
+              className="w-full py-2 px-4 border border-transparent rounded bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </div>
         </form>
@@ -150,10 +150,10 @@ const Login = () => {
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-4">
             <button
               onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+              className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <FaGoogle className="mr-2 text-red-500" />
               Sign in with Google
@@ -161,9 +161,9 @@ const Login = () => {
           </div>
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-gray-600">
           Don't have an account?{' '}
-          <Link to="/signup" className="font-medium text-purple-600 hover:text-pink-500 transition-colors">
+          <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
             Sign up
           </Link>
         </p>

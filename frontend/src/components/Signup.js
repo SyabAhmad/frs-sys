@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom'; // Import Link and useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 
 // Placeholder for API call
 const registerUser = async (name, email, password) => {
   console.log('Attempting to register with:', { name, email, password });
   // Replace with your actual API call
-  const response = await fetch('http://localhost:5000/signup', { // Assuming your Flask backend is running on port 5000
+  const response = await fetch('http://localhost:5000/signup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ full_name: name, email: email, password: password }),
@@ -27,7 +27,7 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // For navigation after successful signup
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -63,27 +63,27 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-pink-500 p-4">
-      <div className="bg-white p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-500 hover:scale-105">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-purple-700 mb-2">
-            Create Your Account
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Create Account
           </h1>
-          <p className="text-gray-600">Join us and explore the features!</p>
+          <p className="text-gray-600 text-sm mt-1">Please fill in your information below</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-lg text-sm">
+          <div className="mb-4 p-3 bg-red-50 text-red-700 border-l-4 border-red-500 rounded text-sm">
             {error}
           </div>
         )}
         {successMessage && (
-          <div className="mb-4 p-3 bg-green-100 text-green-700 border border-green-300 rounded-lg text-sm">
+          <div className="mb-4 p-3 bg-green-50 text-green-700 border-l-4 border-green-500 rounded text-sm">
             {successMessage}
           </div>
         )}
 
-        <form onSubmit={handleSignup} className="space-y-6">
+        <form onSubmit={handleSignup} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
               Full Name
@@ -100,13 +100,13 @@ const Signup = () => {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="John Doe"
               />
             </div>
           </div>
 
-          <div> {/* Changed from <div></div> */}
+          <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
             </label>
@@ -122,7 +122,7 @@ const Signup = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="you@example.com"
               />
             </div>
@@ -144,13 +144,13 @@ const Signup = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
-                placeholder="•••••••• (min. 6 characters)"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Minimum 6 characters"
               />
             </div>
           </div>
 
-          <div> {/* Changed from <div></div> */}
+          <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
               Confirm Password
             </label>
@@ -166,27 +166,27 @@ const Signup = () => {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
-                placeholder="••••••••"
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Confirm your password"
               />
             </div>
           </div>
 
-          <div>
+          <div className="pt-2">
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-medium text-white bg-purple-600 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-all duration-300 ease-in-out disabled:opacity-50"
+              className="w-full py-2 px-4 border border-transparent rounded bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {loading ? 'Creating Account...' : 'Sign Up'}
+              {loading ? 'Processing...' : 'Create Account'}
             </button>
           </div>
         </form>
 
-        <p className="mt-8 text-center text-sm text-gray-500"> {/* Corrected paragraph structure */}
+        <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <Link to="/login" className="font-medium text-purple-600 hover:text-pink-500 transition-colors">
-            Log in
+          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+            Sign in
           </Link>
         </p>
       </div>
