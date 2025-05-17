@@ -1,0 +1,11 @@
+flask
+flask-cors
+flask-sqlalchemy
+opencv-python
+psycopg2-binary
+python-dotenv
+sqlalchemy
+PyJWT
+numpy
+Werkzeug
+qdrant-client
