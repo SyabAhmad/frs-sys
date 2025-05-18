@@ -112,6 +112,10 @@ def create_database_tables():
     DB_NAME = os.getenv('DB_NAME', 'frs_db')
     
     try:
+        # Create user_images directory if it doesn't exist
+        os.makedirs('user_images', exist_ok=True)
+        
+        # Create all tables in the database
         Base.metadata.create_all(bind=engine)
         print("Database tables checked/created (if they didn't exist).")
     except Exception as e:

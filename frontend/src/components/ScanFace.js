@@ -51,6 +51,7 @@ const ScanFace = () => {
   const toggleCamera = () => {
     setCameraActive(!cameraActive);
     if (image) setImage(null); // Clear captured image when toggling camera
+    if (result) setResult(null); // Clear results when toggling camera
   };
 
   const capture = () => {
@@ -71,11 +72,13 @@ const ScanFace = () => {
     const dataUrl = canvas.toDataURL('image/jpeg');
     setImage(dataUrl);
     
-    // Here you would typically send this image to your backend for processing
+    // Clear any previous results
+    if (result) setResult(null);
+    
     console.log("Image captured, ready to send to backend");
   };
 
-  // Only update the processImage function to connect with our backend
+  // Updated to handle the new response format with top 5 matches
   const processImage = async () => {
     if (!image) return;
     
@@ -83,7 +86,6 @@ const ScanFace = () => {
     
     try {
       // Prepare the image data for sending to backend
-      // We convert the data URL to a base64 string the backend can process
       const base64Image = image.split(',')[1];
       
       // Call the recognition API
@@ -100,11 +102,13 @@ const ScanFace = () => {
       
       const data = await response.json();
       setResult(data);
+      console.log("Recognition results:", data);
     } catch (error) {
       console.error('Error processing image:', error);
       setResult({
         recognized: false,
-        error: error.message || 'Failed to process image'
+        error: error.message || 'Failed to process image',
+        matches: []
       });
     } finally {
       setProcessing(false);
@@ -114,6 +118,13 @@ const ScanFace = () => {
   const handleBack = () => {
     // Navigate back to dashboard
     navigate('/dashboard');
+  };
+
+  // Get confidence color based on confidence score
+  const getConfidenceColor = (confidence) => {
+    if (confidence >= 80) return "text-green-600";
+    if (confidence >= 60) return "text-yellow-600";
+    return "text-red-600";
   };
 
   return (
@@ -181,7 +192,10 @@ const ScanFace = () => {
             
             {image && (
               <button
-                onClick={() => setImage(null)}
+                onClick={() => {
+                  setImage(null);
+                  setResult(null);
+                }}
                 className="py-2 px-4 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors"
               >
                 ↻ Reset
@@ -214,18 +228,74 @@ const ScanFace = () => {
             </div>
           )}
 
-          {/* Recognition Results */}
+          {/* Recognition Results - Updated to show top matches */}
           {result && (
-            <div className={`mt-4 p-4 rounded-lg ${result.recognized ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-              <h3 className="font-medium text-lg mb-2">
-                {result.recognized ? 'Person Identified' : 'No Match Found'}
-              </h3>
+            <div className="mt-4 p-4 rounded-lg">
+              <h3 className="font-medium text-lg mb-2">Face Recognition Results</h3>
               
-              {result.recognized ? (
+              {/* Show recognition message */}
+              <div className={`p-3 mb-4 rounded-lg ${result.recognized ? 'bg-green-100 border border-green-300' : 'bg-yellow-100 border border-yellow-300'}`}>
+                <p className="font-medium">
+                  {result.message || (result.recognized ? 'Person identified successfully!' : 'No confident match found')}
+                </p>
+              </div>
+
+              {/* Show error if any */}
+              {result.error && (
+                <div className="p-3 mb-4 bg-red-100 border border-red-300 rounded-lg">
+                  <p className="text-red-700">{result.error}</p>
+                </div>
+              )}
+              
+              {/* Show the matches */}
+              {result.matches && result.matches.length > 0 ? (
                 <div>
+                  <h4 className="font-medium text-gray-700 mt-3 mb-2">Top Matches:</h4>
+                  <div className="overflow-hidden bg-gray-50 border border-gray-200 rounded-lg">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {result.matches.map((match, index) => (
+                          <tr key={index} className={result.recognized && result.user && result.user.id === match.user_id ? 'bg-green-50' : ''}>
+                            <td className="px-4 py-2 whitespace-nowrap">
+                              <div className="text-sm font-medium text-gray-900">{match.name}</div>
+                            </td>
+                            <td className="px-4 py-2 whitespace-nowrap">
+                              <div className="text-sm text-gray-500">{match.department}</div>
+                            </td>
+                            <td className="px-4 py-2 whitespace-nowrap">
+                              <div className={`text-sm font-medium ${getConfidenceColor(match.confidence)}`}>
+                                {match.confidence}%
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-600">No potential matches found.</p>
+              )}
+              
+              {/* Show additional details for recognized user */}
+              {result.recognized && result.user && (
+                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <h4 className="font-medium mb-2">Recognized Person Details:</h4>
                   <p><strong>Name:</strong> {result.user.name}</p>
                   <p><strong>Department:</strong> {result.user.department}</p>
-                  <div className="mt-2">
+                  {result.user.occupation && (
+                    <p><strong>Occupation:</strong> {result.user.occupation}</p>
+                  )}
+                  <p><strong>Confidence:</strong> <span className={getConfidenceColor(result.user.confidence)}>{result.user.confidence}%</span></p>
+                  
+                  <div className="mt-3">
                     <button
                       onClick={handleBack}
                       className="py-1 px-3 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700"
@@ -234,8 +304,6 @@ const ScanFace = () => {
                     </button>
                   </div>
                 </div>
-              ) : (
-                <p>{result.error || "Could not identify the person in the image."}</p>
               )}
             </div>
           )}
