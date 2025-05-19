@@ -6,8 +6,8 @@ import MainContent from './components/MainContent';
 import Login from './components/login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
-import ScanFace from './components/ScanFace';
-import AddUser from './components/AddUser';
+import AddPeople from './components/add-people';
+import ScanPeople from './components/scan-people'; // Import the new component
 
 // A wrapper component is needed to use the useNavigate hook
 // because App itself is where Router is defined.
@@ -15,8 +15,8 @@ const AppContent = () => {
   const navigate = useNavigate(); // Hook for navigation
   const location = useLocation(); // Hook to get current location
   
-  // Check if current path should have header
-  const hideHeader = ['/dashboard', '/scan', '/add-user'].includes(location.pathname);
+  // Update this line to include /scan-people in the hideHeader list
+  const hideHeader = ['/dashboard', '/scan-people', '/add-people'].includes(location.pathname);
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
@@ -43,10 +43,10 @@ const AppContent = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/scan" element={<ScanFace />} />
-          <Route path="/add-user" element={<AddUser />} />
+          <Route path="/scan-people" element={<ScanPeople />} /> {/* Add this new route */}
+          <Route path="/add-people" element={<AddPeople />} />
         </Routes>
-      </main>
+      </main> 
       
       <Footer />
     </div>
