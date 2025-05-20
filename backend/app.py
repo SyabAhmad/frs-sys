@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename # For handling filenames
 import uuid # For generating unique filenames
 import face_recognition
 import numpy as np
+import secrets # For generating tokens
 
 app = Flask(__name__)
 CORS(app) # This will allow requests from your frontend (defaulting to all origins)
@@ -74,25 +75,29 @@ def signup():
 
     conn = None
     try:
-        conn = get_db_connection() # Uses the imported function
+        conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        # Assuming your users table has columns: id (SERIAL PK), username, email, password_hash
+        # Check if email already exists
         cur.execute("SELECT email FROM users WHERE email = %s", (email,))
         if cur.fetchone():
-            return jsonify({"error": "Email already registered"}), 409
+            return jsonify({"error": "Email already registered", "field": "email"}), 409
+            
+        # Check if username already exists
+        cur.execute("SELECT username FROM users WHERE username = %s", (full_name,))
+        if cur.fetchone():
+            return jsonify({"error": "Username already taken, please try a different name", "field": "username"}), 409
 
-        # Ensure column names match your schema: 'username', 'email', 'password_hash'
-        # And the primary key is 'id'
+        # Proceed with registration if username and email are unique
         cur.execute(
             "INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s) RETURNING id",
             (full_name, email, hashed_pw.decode('utf-8')) 
         )
         user_id_data = cur.fetchone()
-        if not user_id_data or 'id' not in user_id_data: # Changed 'user_id' to 'id'
+        if not user_id_data or 'id' not in user_id_data:
              app.logger.error("User ID not returned after insert.")
              return jsonify({"error": "Failed to register user"}), 500
-        user_id = user_id_data['id'] # Changed 'user_id' to 'id'
+        user_id = user_id_data['id']
         conn.commit()
         
         return jsonify({"message": "User registered successfully!", "user_id": user_id}), 201
@@ -115,39 +120,39 @@ def login():
     email = data.get('email')
     password = data.get('password')
 
-    if not email or not password:
-        return jsonify({"error": "Missing email or password"}), 400
+    if not all([email, password]):
+        return jsonify({'error': 'Missing email or password'}), 400
 
     conn = None
-    cur = None # Initialize cur to None
     try:
-        conn = get_db_connection() # Uses the imported function
+        conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        # Ensure column names match your schema: 'id', 'username', 'email', 'password_hash'
+        # Check if user exists
         cur.execute("SELECT id, username, email, password_hash FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
-
-        if user and check_password(password, user['password_hash']): # Changed user['password'] to user['password_hash']
-            placeholder_token = str(user['id']) # Changed user['user_id'] to user['id']
-
-            return jsonify({
-                "message": "Login successful",
-                "user_id": user['id'], # Changed user['user_id'] to user['id']
-                "username": user['username'],
-                "email": user['email'],
-                "token": placeholder_token 
-            }), 200
-        else:
-            return jsonify({"error": "Invalid email or password"}), 401
-    except psycopg2.Error as e:
-        if conn:
-            conn.rollback()
-        app.logger.error(f"Database error during login: {e}")
-        return jsonify({"error": "Database error", "details": str(e)}), 500
+        
+        if not user:
+            return jsonify({'error': 'Invalid email or password'}), 401
+            
+        # Check password
+        if not check_password(password, user['password_hash']):
+            return jsonify({'error': 'Invalid email or password'}), 401
+            
+        # Generate token (you would use a proper JWT here)
+        token = secrets.token_hex(16)
+        
+        # Don't return the password hash to the client
+        user.pop('password_hash', None)
+        
+        return jsonify({
+            'message': 'Login successful',
+            'token': token,
+            'user': user
+        }), 200
     except Exception as e:
-        app.logger.error(f"Unexpected error during login: {e}")
-        return jsonify({"error": "An unexpected error occurred", "details": str(e)}), 500
+        app.logger.error(f"Login error: {e}")
+        return jsonify({'error': 'Login failed'}), 500
     finally:
         if conn:
             cur.close()

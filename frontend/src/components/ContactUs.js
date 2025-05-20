@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// You can import icons for contact details if you like
 // import { FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa';
 
 const ContactUs = () => {
@@ -19,10 +18,9 @@ const ContactUs = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission logic here (e.g., send data to a backend)
     console.log('Form data submitted:', formData);
-    alert('Thank you for your message! We will get back to you soon.');
-    setFormData({ name: '', email: '', message: '' }); // Reset form
+    alert('Thank you for your message! Our team will get back to you shortly.');
+    setFormData({ name: '', email: '', message: '' });
   };
 
   return (
@@ -30,15 +28,15 @@ const ContactUs = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-purple-700 mb-4">
-            Get In Touch
+            Contact Our Team
           </h2>
           <p className="text-lg text-pink-600 font-medium">
-            We'd love to hear from you! Send us a message or find our contact details below.
+            Whether you’re a partner, investor, or just curious, we’d love to hear from you!
           </p>
         </div>
 
         <div className="flex flex-wrap -mx-4">
-          {/* Contact Form Column */}
+          {/* Contact Form */}
           <div className="w-full lg:w-1/2 px-4 mb-12 lg:mb-0">
             <div className="bg-white p-8 rounded-lg shadow-xl">
               <h3 className="text-2xl font-semibold text-purple-700 mb-6">Send Us a Message</h3>
@@ -94,34 +92,32 @@ const ContactUs = () => {
             </div>
           </div>
 
-          {/* Contact Details Column */}
+          {/* Contact Details */}
           <div className="w-full lg:w-1/2 px-4">
-            <div className="bg-white p-8 rounded-lg shadow-xl h-full"> {/* Added h-full for consistent height if desired */}
-              <h3 className="text-2xl font-semibold text-purple-700 mb-6">Contact Information</h3>
+            <div className="bg-white p-8 rounded-lg shadow-xl h-full">
+              <h3 className="text-2xl font-semibold text-purple-700 mb-6">Company Information</h3>
               <div className="space-y-4 text-gray-700">
                 <p className="flex items-start">
-                  {/* <FaMapMarkerAlt className="text-purple-600 mr-3 mt-1 flex-shrink-0" size={20} /> */}
-                  <span className="font-semibold mr-2">Address:</span>
-                  <span>123 Innovation Drive, Tech City, TC 54321</span>
+                  <span className="font-semibold mr-2">Head Office:</span>
+                  <span>Block B, Tech Incubator, Innovation Park, Peshawar, KP 25000</span>
                 </p>
                 <p className="flex items-start">
-                  {/* <FaEnvelope className="text-purple-600 mr-3 mt-1 flex-shrink-0" size={20} /> */}
                   <span className="font-semibold mr-2">Email:</span>
-                  <a href="mailto:info@frs.example.com" className="text-pink-600 hover:text-pink-700 transition-colors">info@frs.example.com</a>
+                  <a href="mailto:contact@ai3labs.com" className="text-pink-600 hover:text-pink-700 transition-colors">contact@ai3labs.com</a>
                 </p>
                 <p className="flex items-start">
-                  {/* <FaPhone className="text-purple-600 mr-3 mt-1 flex-shrink-0" size={20} /> */}
                   <span className="font-semibold mr-2">Phone:</span>
-                  <a href="tel:+1234567890" className="text-pink-600 hover:text-pink-700 transition-colors">(123) 456-7890</a>
+                  <a href="tel:+92987654321" className="text-pink-600 hover:text-pink-700 transition-colors">+92 987 654321</a>
                 </p>
                 <p className="mt-6 text-sm">
-                  Feel free to reach out through any of these channels. We aim to respond to all inquiries within 24-48 hours.
+                  We're a growing AI startup revolutionizing intelligent solutions. Reach out to us for partnerships, product inquiries, or media.
                 </p>
               </div>
-              {/* Optional: Add a map here */}
+
+              {/* Optional Map Embed */}
               {/* <div className="mt-8 rounded-lg overflow-hidden shadow-md">
                 <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d..." // Replace with your Google Maps embed link
+                  src="https://www.google.com/maps/embed?pb=..." 
                   width="100%" 
                   height="250" 
                   style={{ border:0 }} 

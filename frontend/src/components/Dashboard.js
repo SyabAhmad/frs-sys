@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserPlus, FaCamera, FaSignOutAlt, FaUserCheck } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
     const navigate = useNavigate();
+    const { logout, currentUser } = useAuth();
     
     const handleAddPeopleClick = () => {
         navigate('/add-people');
@@ -14,7 +16,7 @@ const Dashboard = () => {
     };
 
     const handleLogout = () => {
-        // Perform logout logic (e.g., clear tokens/storage)
+        logout();
         navigate('/');
     };
 
@@ -27,7 +29,12 @@ const Dashboard = () => {
                         <div className="h-12 w-12 rounded-full bg-teal-500 flex items-center justify-center">
                             <FaUserCheck className="text-2xl text-white" />
                         </div>
-                        <h1 className="text-3xl font-bold tracking-tight text-white">FaceID Dashboard</h1>
+                        <div>
+                            <h1 className="text-3xl font-bold tracking-tight text-white">FaceID Dashboard</h1>
+                            {currentUser && (
+                                <p className="text-teal-300">Welcome, {currentUser.full_name || currentUser.email}</p>
+                            )}
+                        </div>
                     </div>
                     
                     <button 
@@ -125,10 +132,10 @@ const Dashboard = () => {
                     </div>
                 </div>
                 
-                {/* Footer */}
+                {/* Footer
                 <div className="mt-12 pt-6 border-t border-slate-700 text-center text-sm text-slate-400">
                     Face Recognition System &copy; {new Date().getFullYear()} | Secure Facial Identification
-                </div>
+                </div> */}
             </div>
         </div>
     );

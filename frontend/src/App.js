@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import MainContent from './components/MainContent';
@@ -7,11 +7,47 @@ import Login from './components/login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 import AddPeople from './components/add-people';
-import ScanPeople from './components/scan-people'; // Import the new component
+import ScanPeople from './components/scan-people';
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-// A wrapper component is needed to use the useNavigate hook
+// Protected Route component
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-slate-900">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+    </div>;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+};
+
+// Public route that redirects to dashboard if already logged in
+const PublicOnlyRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-slate-900">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+    </div>;
+  }
+  
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
+};
+
+// A wrapper component is needed to use the useAuth hook
 // because App itself is where Router is defined.
 const AppContent = () => {
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate(); // Hook for navigation
   const location = useLocation(); // Hook to get current location
   
@@ -34,19 +70,42 @@ const AppContent = () => {
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Only render Header if not on dashboard, scan, or add-user pages */}
       {!hideHeader && (
-        <Header scrollToSection={scrollToSection} navigateTo={handleNavigate} />
+        <Header 
+          scrollToSection={scrollToSection} 
+          navigateTo={handleNavigate}
+        />
       )}
       
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<MainContent />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/scan-people" element={<ScanPeople />} /> {/* Add this new route */}
-          <Route path="/add-people" element={<AddPeople />} />
+          <Route path="/login" element={
+            <PublicOnlyRoute>
+              <Login />
+            </PublicOnlyRoute>
+          } />
+          <Route path="/signup" element={
+            <PublicOnlyRoute>
+              <Signup />
+            </PublicOnlyRoute>
+          } />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/scan-people" element={
+            <ProtectedRoute>
+              <ScanPeople />
+            </ProtectedRoute>
+          } />
+          <Route path="/add-people" element={
+            <ProtectedRoute>
+              <AddPeople />
+            </ProtectedRoute>
+          } />
         </Routes>
-      </main> 
+      </main>
       
       <Footer />
     </div>
@@ -55,9 +114,11 @@ const AppContent = () => {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
   );
 }
 
