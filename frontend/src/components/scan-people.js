@@ -11,7 +11,6 @@ export default function ScanPeople() {
   const webcamRef = useRef(null);
   const navigate = useNavigate();
 
-  // Capture image from webcam
   const captureImage = useCallback(() => {
     if (webcamRef.current) {
       const imageSrc = webcamRef.current.getScreenshot();
@@ -21,14 +20,12 @@ export default function ScanPeople() {
     }
   }, [webcamRef]);
 
-  // Reset captured image
   const resetCapture = () => {
     setCapturedImage(null);
     setScanResult(null);
     setScanError(null);
   };
 
-  // Handle scanning the captured image
   const handleScan = async () => {
     if (!capturedImage) return;
 
@@ -37,15 +34,12 @@ export default function ScanPeople() {
     setScanResult(null);
 
     try {
-      // Convert base64 to blob
       const response = await fetch(capturedImage);
       const blob = await response.blob();
       
-      // Create form data with the captured image
       const formData = new FormData();
       formData.append('faceImage', blob, 'captured-face.jpg');
       
-      // Send the image to the backend for scanning/recognition
       const scanResponse = await fetch('http://localhost:5000/api/scan', {
         method: 'POST',
         body: formData
@@ -66,14 +60,12 @@ export default function ScanPeople() {
     }
   };
 
-  // Navigate back to dashboard
   const handleBack = () => {
     navigate('/dashboard');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-      {/* Custom Header */}
       <div className="bg-slate-800 text-white p-4 shadow-md border-b border-slate-700">
         <div className="container mx-auto flex justify-between items-center">
           <h2 className="text-xl font-semibold">Face Recognition System</h2>
@@ -92,7 +84,6 @@ export default function ScanPeople() {
           <h2 className="text-3xl font-bold mb-8 text-white text-center">Scan Face</h2>
           
           <div className="flex flex-col items-center space-y-8">
-            {/* Webcam or Captured Image */}
             <div className="w-full max-w-xl bg-slate-700 p-6 rounded-lg shadow-lg border border-slate-600">
               {!capturedImage ? (
                 <div className="flex flex-col items-center space-y-6">
@@ -147,7 +138,6 @@ export default function ScanPeople() {
               )}
             </div>
 
-            {/* Scan Results Area */}
             {scanResult && (
               <div className="w-full max-w-xl bg-emerald-900 p-6 rounded-lg border border-emerald-700 shadow-lg">
                 <h3 className="text-xl font-bold text-emerald-300 mb-4">Match Found!</h3>
@@ -171,7 +161,6 @@ export default function ScanPeople() {
               </div>
             )}
 
-            {/* Error Message */}
             {scanError && (
               <div className="w-full max-w-xl bg-rose-900 p-6 rounded-lg border border-rose-700 shadow-lg">
                 <p className="text-rose-200">{scanError}</p>

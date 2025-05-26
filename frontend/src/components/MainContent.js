@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AboutUs from './AboutUs'; 
 import Team from './Team';
 import ContactUs from './ContactUs';
 import Workflow from './workflow';
+import { AuthContext } from '../context/AuthContext';
 
 const MainContent = () => {
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   return (
     <main>
-      {/* Hero Section with Updated Gradient Background */}
       <section 
         id="hero" 
-        className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-20 md:py-32 shadow-lg" 
+        className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-20 md:py-32 shadow-lg overflow-hidden" 
       >
-        {/* Custom visual elements for interest */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500 opacity-5 rounded-full -mt-24 -mr-24"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500 opacity-5 rounded-full -mb-16 -ml-16"></div>
         
@@ -24,9 +27,11 @@ const MainContent = () => {
             Experience the future of identification technology. Secure, fast, and reliable.
           </p>
           
-          {/* Updated button styling to match Dashboard */}
           <div className="flex justify-center space-x-4">
-            <button className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300 ease-in-out shadow-md hover:shadow-lg">
+            <button
+              onClick={() => navigate(user ? '/dashboard' : '/login')}
+              className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300 ease-in-out shadow-md hover:shadow-lg"
+            >
               Get Started
             </button>
             <button className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300 ease-in-out shadow-md hover:shadow-lg">
@@ -36,7 +41,6 @@ const MainContent = () => {
         </div>
       </section>
 
-      {/* Other Sections */}
       <Workflow />
       <Team />
       <AboutUs />

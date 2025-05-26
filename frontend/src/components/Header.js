@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import { FaUserCheck, FaSignInAlt, FaCamera, FaSignOutAlt } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FaSignInAlt, FaUserPlus, FaTachometerAlt, FaSignOutAlt, FaBars, FaTimes, FaHome, FaInfoCircle, FaUsers, FaEnvelope, FaCogs, FaCamera } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 
-const Header = ({ scrollToSection, navigateTo }) => {
+const Header = ({ scrollToSection }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -12,183 +15,177 @@ const Header = ({ scrollToSection, navigateTo }) => {
 
   const handleScanFace = () => {
     if (isAuthenticated) {
-      console.log('Scan Face button clicked');
-      if (navigateTo) navigateTo('/scan-people');
+      navigate('/scan');
     } else {
-      // Redirect to login if not authenticated
-      if (navigateTo) navigateTo('/login');
+      alert('Please log in to scan a face.');
+      navigate('/login');
     }
+    setIsMenuOpen(false);
   };
 
   const handleNavClick = (e, sectionId) => {
     e.preventDefault();
-    if (scrollToSection) {
+    if (location.pathname !== '/') {
+      navigate('/', { state: { scrollToSection: sectionId } });
+    } else {
       scrollToSection(sectionId);
     }
-    if (isMenuOpen) { // Close mobile menu after click
-      setIsMenuOpen(false);
-    }
+    setIsMenuOpen(false);
   };
-
+  
   const handleHomeNavigation = (e) => {
-    e.preventDefault(); // Prevent default anchor action
-    if (navigateTo) {
-      navigateTo('/');
-    }
-    if (isMenuOpen) {
-      setIsMenuOpen(false);
-    }
+    e.preventDefault();
+    navigate('/');
+    setIsMenuOpen(false); 
   };
 
   const handleLoginNavigation = (e) => {
-    e.preventDefault(); // Prevent default anchor action
-    if (navigateTo) {
-      navigateTo('/login');
-    }
-    if (isMenuOpen) {
-      setIsMenuOpen(false);
-    }
+    e.preventDefault();
+    navigate('/login');
+    setIsMenuOpen(false);
   };
 
   const handleLogout = (e) => {
     e.preventDefault();
     logout();
-    if (navigateTo) navigateTo('/');
-    if (isMenuOpen) {
-      setIsMenuOpen(false);
-    }
+    navigate('/');
+    setIsMenuOpen(false);
   };
 
   const handleDashboardNavigation = (e) => {
     e.preventDefault();
-    if (navigateTo) navigateTo('/dashboard');
-    if (isMenuOpen) {
-      setIsMenuOpen(false);
-    }
+    navigate('/dashboard');
+    setIsMenuOpen(false); 
   };
 
+  useEffect(() => {
+    if (location.state && location.state.scrollToSection && location.pathname === '/') {
+      scrollToSection(location.state.scrollToSection);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate, scrollToSection]);
+
+
+  const navLinks = [
+    { id: 'home', label: 'Home', icon: <FaHome className="mr-2" />, action: handleHomeNavigation, sectionId: 'hero' },
+    { id: 'about-us', label: 'About', icon: <FaInfoCircle className="mr-2" />, action: (e) => handleNavClick(e, 'about-us'), sectionId: 'about-us' },
+    { id: 'workflow', label: 'Workflow', icon: <FaCogs className="mr-2" />, action: (e) => handleNavClick(e, 'workflow'), sectionId: 'workflow' },
+    { id: 'team', label: 'Team', icon: <FaUsers className="mr-2" />, action: (e) => handleNavClick(e, 'team'), sectionId: 'team' },
+    { id: 'contact-us', label: 'Contact', icon: <FaEnvelope className="mr-2" />, action: (e) => handleNavClick(e, 'contact-us'), sectionId: 'contact-us' },
+  ];
+
   return (
-    <nav className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-lg sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          {/* Title */}
-          <div 
-            className="flex items-center space-x-2 cursor-pointer"
-            onClick={handleHomeNavigation}
-          >
-            <div className="h-9 w-9 rounded-full bg-teal-500 flex items-center justify-center">
-              <FaUserCheck className="text-xl text-white" />
-            </div>
-            <a href="/" onClick={handleHomeNavigation} className="text-2xl md:text-3xl font-bold text-white hover:text-teal-300 transition duration-300">
-              FaceID System
-            </a>
+    <nav className="bg-slate-900 text-white shadow-lg fixed w-full z-50 top-0 overflow-hidden">
+      <div className="container mx-auto px-6 py-3">
+        <div className="flex justify-between items-center">
+          <a href="/" onClick={handleHomeNavigation} className="text-2xl font-bold hover:text-slate-300 transition-colors flex items-center">
+            {/* <img src={logo} alt="FRS Logo" className="h-8 w-auto mr-2" /> */}
+            FRS
+          </a>
+
+          <div className="hidden md:flex flex-grow justify-center items-center space-x-1">
+            {navLinks.map(link => (
+              <a
+                key={link.id}
+                href={`#${link.sectionId}`}
+                onClick={link.action}
+                className="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-800 transition-colors flex items-center"
+              >
+                {link.icon} {link.label}
+              </a>
+            ))}
           </div>
 
-          {/* Navigation Links - Desktop */}
-          <div className="hidden md:flex items-center space-x-4">
-            <a href="#hero" onClick={(e) => handleNavClick(e, 'hero')} className="text-slate-300 hover:text-teal-300 transition duration-300">
-              Home
-            </a>
-            <a href="#workflow" onClick={(e) => handleNavClick(e, 'workflow')} className="text-slate-300 hover:text-teal-300 transition duration-300">
-              How It Works
-            </a>
-            <a href="#about-us" onClick={(e) => handleNavClick(e, 'about-us')} className="text-slate-300 hover:text-teal-300 transition duration-300">
-              About Us
-            </a>
-            <a href="#team" onClick={(e) => handleNavClick(e, 'team')} className="text-slate-300 hover:text-teal-300 transition duration-300">
-              Team
-            </a>
-            <a href="#contact-us" onClick={(e) => handleNavClick(e, 'contact-us')} className="text-slate-300 hover:text-teal-300 transition duration-300">
-              Contact Us
-            </a>
-            
-            {/* Conditional rendering based on auth status */}
+          <div className="hidden md:flex items-center space-x-3">
             <button
               onClick={handleScanFace}
-              className={`flex items-center space-x-1 ${
-                isAuthenticated ? "bg-amber-600 hover:bg-amber-700" : "bg-slate-600 hover:bg-slate-700"
-              } text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-md`}
+              className="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center text-sm"
             >
-              <FaCamera className="mr-2" />
-              Scan Face
-              {!isAuthenticated && <span className="text-xs ml-1">(Login Required)</span>}
+              <FaCamera className="mr-2" /> Scan Face
             </button>
-            
             {isAuthenticated ? (
               <>
-                <a href="/dashboard" onClick={handleDashboardNavigation} className="flex items-center space-x-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out">
-                  <FaUserCheck className="mr-1" />
-                  Dashboard
-                </a>
-                <a href="#" onClick={handleLogout} className="flex items-center space-x-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out">
-                  <FaSignOutAlt className="mr-1" />
-                  Logout
-                </a>
+                <button
+                  onClick={handleDashboardNavigation}
+                  className="bg-teal-600 hover:bg-teal-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center text-sm"
+                >
+                  <FaTachometerAlt className="mr-2" /> Dashboard
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center text-sm"
+                >
+                  <FaSignOutAlt className="mr-2" /> Logout
+                </button>
               </>
             ) : (
-              <a href="/login" onClick={handleLoginNavigation} className="flex items-center space-x-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-md shadow-md transition duration-300 ease-in-out">
-                <FaSignInAlt className="mr-1" />
-                Login
-              </a>
+              <>
+                <button
+                  onClick={handleLoginNavigation}
+                  className="bg-teal-500 hover:bg-teal-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center text-sm"
+                >
+                  <FaSignInAlt className="mr-2" /> Login
+                </button>
+
+              </>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button onClick={toggleMenu} className="text-slate-300 hover:text-teal-300 focus:outline-none">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {isMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                )}
-              </svg>
+          <div className="md:hidden flex items-center">
+            <button onClick={toggleMenu} className="text-white focus:outline-none">
+              {isMenuOpen ? <FaTimes className="h-6 w-6" /> : <FaBars className="h-6 w-6" />}
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-slate-800 border-t border-slate-700">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="#hero" onClick={(e) => handleNavClick(e, 'hero')} className="block text-slate-300 hover:text-teal-300 px-3 py-2 rounded-md text-base font-medium">Home</a>
-            <a href="#workflow" onClick={(e) => handleNavClick(e, 'workflow')} className="block text-slate-300 hover:text-teal-300 px-3 py-2 rounded-md text-base font-medium">How It Works</a>
-            <a href="#about-us" onClick={(e) => handleNavClick(e, 'about-us')} className="block text-slate-300 hover:text-teal-300 px-3 py-2 rounded-md text-base font-medium">About Us</a>
-            <a href="#team" onClick={(e) => handleNavClick(e, 'team')} className="block text-slate-300 hover:text-teal-300 px-3 py-2 rounded-md text-base font-medium">Team</a>
-            <a href="#contact-us" onClick={(e) => handleNavClick(e, 'contact-us')} className="block text-slate-300 hover:text-teal-300 px-3 py-2 rounded-md text-base font-medium">Contact Us</a>
-            
+        {isMenuOpen && (
+          <div className="md:hidden mt-3 space-y-1 bg-slate-800 rounded-md shadow-xl p-2">
+            {navLinks.map(link => (
+              <a
+                key={link.id}
+                href={`#${link.sectionId}`}
+                onClick={link.action}
+                className="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-700 transition-colors flex items-center"
+              >
+                {link.icon} {link.label}
+              </a>
+            ))}
+            <hr className="border-slate-700 my-2" />
             <button
-              onClick={() => { handleScanFace(); if (isMenuOpen) setIsMenuOpen(false); }}
-              className={`w-full flex items-center justify-center text-left ${
-                isAuthenticated ? "bg-amber-600 hover:bg-amber-700" : "bg-slate-600 hover:bg-slate-700"
-              } text-white px-3 py-2 rounded-md text-base font-medium mt-1`}
+              onClick={handleScanFace}
+              className="w-full text-left bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-3 rounded-md shadow-sm transition-colors duration-150 flex items-center"
             >
-              <FaCamera className="mr-2" />
-              Scan Face
-              {!isAuthenticated && <span className="text-xs ml-1">(Login Required)</span>}
+              <FaCamera className="mr-2" /> Scan Face
             </button>
-            
             {isAuthenticated ? (
               <>
-                <a href="/dashboard" onClick={handleDashboardNavigation} className="block flex items-center justify-center bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-3 rounded-md shadow-md transition duration-300 ease-in-out mt-1">
-                  <FaUserCheck className="mr-2" />
-                  Dashboard
-                </a>
-                <a href="#" onClick={handleLogout} className="block flex items-center justify-center bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded-md shadow-md transition duration-300 ease-in-out mt-1">
-                  <FaSignOutAlt className="mr-2" />
-                  Logout
-                </a>
+                <button
+                  onClick={handleDashboardNavigation}
+                  className="w-full text-left mt-1 bg-teal-600 hover:bg-teal-500 text-white font-semibold py-2 px-3 rounded-md shadow-sm transition-colors duration-150 flex items-center"
+                >
+                  <FaTachometerAlt className="mr-2" /> Dashboard
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left mt-1 bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-3 rounded-md shadow-sm transition-colors duration-150 flex items-center"
+                >
+                  <FaSignOutAlt className="mr-2" /> Logout
+                </button>
               </>
             ) : (
-              <a href="/login" onClick={handleLoginNavigation} className="block flex items-center justify-center bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-3 rounded-md shadow-md transition duration-300 ease-in-out mt-1">
-                <FaSignInAlt className="mr-2" />
-                Login
-              </a>
+              <>
+                <button
+                  onClick={handleLoginNavigation}
+                  className="w-full text-left mt-1 bg-teal-500 hover:bg-teal-400 text-white font-semibold py-2 px-3 rounded-md shadow-sm transition-colors duration-150 flex items-center"
+                >
+                  <FaSignInAlt className="mr-2" /> Login
+                </button>
+
+              </>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
   );
 };

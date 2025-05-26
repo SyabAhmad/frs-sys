@@ -22,7 +22,6 @@ const Dashboard = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-            {/* Top Header Section */}
             <div className="container mx-auto px-6 py-8">
                 <div className="flex justify-between items-center mb-12">
                     <div className="flex items-center space-x-3">
@@ -32,7 +31,7 @@ const Dashboard = () => {
                         <div>
                             <h1 className="text-3xl font-bold tracking-tight text-white">FaceID Dashboard</h1>
                             {currentUser && (
-                                <p className="text-teal-300">Welcome, {currentUser.full_name || currentUser.email}</p>
+                                <p className="text-teal-300">Welcome, {currentUser.full_name || currentUser.username || currentUser.email}</p>
                             )}
                         </div>
                     </div>
@@ -46,7 +45,6 @@ const Dashboard = () => {
                     </button>
                 </div>
                 
-                {/* Welcome Section */}
                 <div className="mb-12 bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
                     <h2 className="text-2xl font-semibold mb-3 text-white">Welcome to Face Recognition System</h2>
                     <p className="text-slate-300">
@@ -54,9 +52,7 @@ const Dashboard = () => {
                     </p>
                 </div>
                 
-                {/* Main Action Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Add Person Card */}
                     <div 
                         onClick={handleAddPeopleClick}
                         className="group relative bg-gradient-to-br from-teal-600 to-teal-800 rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer border border-teal-700"
@@ -83,7 +79,6 @@ const Dashboard = () => {
                         </div>
                     </div>
                     
-                    {/* Scan Face Card */}
                     <div 
                         onClick={handleScanPeopleClick}
                         className="group relative bg-gradient-to-br from-amber-600 to-amber-800 rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer border border-amber-700"
@@ -111,7 +106,6 @@ const Dashboard = () => {
                     </div>
                 </div>
                 
-                {/* System Stats Section */}
                 <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
                         <h4 className="font-medium text-slate-400 mb-1">Total Records</h4>
@@ -132,10 +126,6 @@ const Dashboard = () => {
                     </div>
                 </div>
                 
-                {/* Footer
-                <div className="mt-12 pt-6 border-t border-slate-700 text-center text-sm text-slate-400">
-                    Face Recognition System &copy; {new Date().getFullYear()} | Secure Facial Identification
-                </div> */}
             </div>
         </div>
     );

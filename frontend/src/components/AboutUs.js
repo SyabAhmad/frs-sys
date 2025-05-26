@@ -6,10 +6,10 @@ const AboutUs = () => {
     <section id="about-us" className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-purple-700 mb-3">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
             The Vision Behind Our Platform
           </h2>
-          <p className="text-lg text-pink-600 font-medium">
+          <p className="text-lg text-slate-700 font-medium">
             Built to Redefine Identity Verification with Intelligence & Precision
           </p>
         </div>
@@ -18,8 +18,8 @@ const AboutUs = () => {
           {/* Company Mission */}
           <div className="mb-10 p-6 bg-gray-50 rounded-lg shadow-lg">
             <div className="flex items-center mb-4">
-              <FaLightbulb className="text-pink-500 text-3xl mr-4" />
-              <h3 className="text-2xl font-semibold text-purple-700">
+              <FaLightbulb className="text-slate-700 text-3xl mr-4" />
+              <h3 className="text-2xl font-semibold text-slate-900">
                 Our Mission
               </h3>
             </div>
@@ -31,8 +31,8 @@ const AboutUs = () => {
           {/* Origins */}
           <div className="mb-10 p-6 bg-gray-50 rounded-lg shadow-lg">
             <div className="flex items-center mb-4">
-              <FaGraduationCap className="text-purple-600 text-3xl mr-4" />
-              <h3 className="text-2xl font-semibold text-purple-700">
+              <FaGraduationCap className="text-slate-800 text-3xl mr-4" />
+              <h3 className="text-2xl font-semibold text-slate-900">
                 Our Journey
               </h3>
             </div>
@@ -44,21 +44,21 @@ const AboutUs = () => {
           {/* Gratitude */}
           <div className="mb-10 p-6 bg-gray-50 rounded-lg shadow-lg">
             <div className="flex items-center mb-4">
-              <FaHandsHelping className="text-purple-600 text-3xl mr-4" />
-              <h3 className="text-2xl font-semibold text-purple-700">
+              <FaHandsHelping className="text-slate-800 text-3xl mr-4" />
+              <h3 className="text-2xl font-semibold text-slate-900">
                 Collaboration & Support
               </h3>
             </div>
             <p className="text-gray-700 leading-relaxed">
-              We are deeply thankful for the collaboration and support received from industry professionals, researchers, and advisors who have guided our development process. Their insights into machine learning, data privacy, and system architecture were instrumental in shaping a solution that’s not only innovative, but also scalable and secure.
+              We are deeply thankful for the collaboration and support received from industry professionals, researchers, and advisors who have guided our development process. Their insights into machine learning, data privacy, and system architecture were instrumental in shaping a solution that's not only innovative, but also scalable and secure.
             </p>
           </div>
 
           {/* Technology Stack */}
           <div className="p-6 bg-gray-50 rounded-lg shadow-lg">
             <div className="flex items-center mb-4">
-              <FaCode className="text-pink-500 text-3xl mr-4" />
-              <h3 className="text-2xl font-semibold text-purple-700">
+              <FaCode className="text-slate-700 text-3xl mr-4" />
+              <h3 className="text-2xl font-semibold text-slate-900">
                 Technologies Powering Our Platform
               </h3>
             </div>

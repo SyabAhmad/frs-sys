@@ -28,40 +28,33 @@ export default function AddPeople() {
     const { name, value, files } = e.target;
     if (name === 'faceImage') {
       setFormData({ ...formData, [name]: files[0] });
-      // Clear any captured image when a file is manually selected
       setCapturedImage(null);
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
-  // Toggle webcam
   const toggleWebcam = () => {
     setShowWebcam(!showWebcam);
     if (showWebcam) {
-      // If turning off webcam, clear the captured image
       setCapturedImage(null);
     }
   };
 
-  // Capture image from webcam
   const captureImage = useCallback(() => {
     if (webcamRef.current) {
       const imageSrc = webcamRef.current.getScreenshot();
       setCapturedImage(imageSrc);
       
-      // Convert base64 to blob and update form data
       fetch(imageSrc)
         .then(res => res.blob())
         .then(blob => {
-          // Create a File object from the blob
           const file = new File([blob], "webcam-capture.jpg", { type: "image/jpeg" });
           setFormData(prev => ({ ...prev, faceImage: file }));
         });
     }
   }, [webcamRef]);
 
-  // Reset captured image
   const resetCapture = () => {
     setCapturedImage(null);
     setFormData(prev => ({ ...prev, faceImage: null }));
@@ -72,7 +65,7 @@ export default function AddPeople() {
     console.log(formData);
     
     const submitData = async () => {
-      setIsSubmitting(true); // Start loading state
+      setIsSubmitting(true); 
       
       try {
         const formDataToSend = new FormData();
@@ -87,7 +80,6 @@ export default function AddPeople() {
 
         if (response.ok) {
           console.log('Data submitted successfully!');
-          // Reset form
           setFormData({
             full_name: '',
             age: '',
@@ -114,7 +106,7 @@ export default function AddPeople() {
         console.error('Error submitting data:', error);
         alert("An error occurred during submission. Please try again.");
       } finally {
-        setIsSubmitting(false); // End loading state
+        setIsSubmitting(false);
       }
     };
 
@@ -127,7 +119,6 @@ export default function AddPeople() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-      {/* Custom Header */}
       <div className="bg-slate-800 text-white p-4 shadow-md border-b border-slate-700">
         <div className="container mx-auto flex justify-between items-center">
           <h2 className="text-xl font-semibold">Face Recognition System</h2>
@@ -146,7 +137,6 @@ export default function AddPeople() {
           <h2 className="text-3xl font-bold mb-6 text-white text-center">Add Person Record</h2>
           
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Form inputs with dark theme styling */}
             <input 
               type="text" 
               name="full_name" 
@@ -262,7 +252,6 @@ export default function AddPeople() {
                   </button>
                 </div>
                 
-                {/* Webcam and capture container */}
                 {showWebcam && (
                   <div className="bg-slate-700 p-6 rounded-lg flex flex-col items-center space-y-4 border border-slate-600">
                     {!capturedImage ? (
@@ -303,7 +292,6 @@ export default function AddPeople() {
                   </div>
                 )}
                 
-                {/* Regular file upload option (shown when webcam is off or no image captured) */}
                 {(!showWebcam || !capturedImage) && !formData.faceImage && (
                   <div className="bg-slate-700 p-6 rounded-lg border border-slate-600">
                     <label className="block mb-3 font-semibold text-teal-300">Upload Face Image</label>
@@ -322,7 +310,6 @@ export default function AddPeople() {
                   </div>
                 )}
                 
-                {/* Display selected file name if uploaded manually */}
                 {!capturedImage && formData.faceImage && (
                   <div className="text-teal-300 bg-slate-700 p-4 rounded-lg border border-slate-600">
                     Selected file: <span className="font-semibold">{formData.faceImage.name}</span>

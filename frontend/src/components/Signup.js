@@ -13,7 +13,6 @@ const registerUser = async (name, email, password) => {
   const data = await response.json();
   
   if (!response.ok) {
-    // Include more specific error information
     throw {
       message: data.error || 'Registration failed',
       field: data.field || null
@@ -33,7 +32,6 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Clear field-specific errors when the user types
   const handleNameChange = (e) => {
     setName(e.target.value);
     if (errors.name) {
@@ -71,7 +69,7 @@ const Signup = () => {
     const newErrors = {};
 
     if (!name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = "User name is required";
     }
     
     if (!email.trim()) {
@@ -97,7 +95,6 @@ const Signup = () => {
     try {
       const data = await registerUser(name, email, password);
       setSuccessMessage(data.message + " Redirecting to login...");
-      // Clear form fields
       setName('');
       setEmail('');
       setPassword('');
@@ -106,13 +103,11 @@ const Signup = () => {
         navigate('/login');
       }, 2000); 
     } catch (err) {
-      // Handle field-specific errors
       if (err.field === 'email') {
         setErrors({...errors, email: err.message});
       } else if (err.field === 'username') {
         setErrors({...errors, name: err.message});
       } else {
-        // General error
         setErrors({...errors, general: err.message || 'Failed to register. Please try again.'});
       }
     } finally {
@@ -145,7 +140,7 @@ const Signup = () => {
         <form onSubmit={handleSignup} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-1">
-              Full Name
+              User Name
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

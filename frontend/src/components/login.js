@@ -30,7 +30,6 @@ const Login = () => {
         throw new Error(data.error || 'Failed to login');
       }
       
-      // Use the login method from AuthContext
       login(data.user, data.token);
       navigate('/dashboard');
       

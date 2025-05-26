@@ -6,7 +6,6 @@ const Footer = () => {
     <footer className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-lg p-8 mt-auto">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* About Section */}
           <div>
             <h5 className="text-xl font-bold mb-3">Face Recognition System</h5>
             <p className="text-slate-300 text-sm">
@@ -14,7 +13,6 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h5 className="text-xl font-bold mb-3">Quick Links</h5>
             <ul className="space-y-2">
@@ -25,7 +23,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact & Socials */}
           <div>
             <h5 className="text-xl font-bold mb-3">Contact Us</h5>
             <p className="text-slate-300 text-sm mb-1">123 Innovation Drive, Tech City</p>
