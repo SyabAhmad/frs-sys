@@ -297,7 +297,7 @@ export default function AddPeople() {
                     <label className="block mb-3 font-semibold text-teal-300">Upload Face Image</label>
                     <input 
                       type="file" 
-                      accept="image/*" 
+                      accept="image/jpeg,image/jpg,image/png,image/bmp" 
                       name="faceImage" 
                       onChange={handleChange} 
                       className="w-full text-slate-300 file:mr-4 file:py-2 file:px-4
