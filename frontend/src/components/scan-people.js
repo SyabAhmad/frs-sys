@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { FaArrowLeft, FaClock, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 
 export default function ScanPeople() {
   const [capturedImages, setCapturedImages] = useState([]);

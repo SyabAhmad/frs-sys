@@ -119,3 +119,23 @@ def add_person():
         if 'conn' in locals():
             cursor.close()
             conn.close()
+
+@people_bp.route('/api/people/<int:person_id>', methods=['DELETE'])
+def delete_person(person_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM people_records WHERE id = %s RETURNING id", (person_id,))
+        deleted = cur.fetchone()
+        conn.commit()
+        if deleted:
+            return jsonify({"message": "Person deleted successfully."}), 200
+        else:
+            return jsonify({"error": "Person not found."}), 404
+    except Exception as e:
+        current_app.logger.error(f"Error deleting person: {e}")
+        return jsonify({"error": f"Failed to delete person: {str(e)}"}), 500
+    finally:
+        if 'conn' in locals() and conn:
+            cur.close()
+            conn.close()

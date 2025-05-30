@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUserPlus, FaCamera, FaSignOutAlt, FaUserCheck, FaHome } from 'react-icons/fa';
+import { FaUserPlus, FaCamera, FaSignOutAlt, FaUserCheck, FaHome, FaUserMinus } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
@@ -138,7 +138,8 @@ const Dashboard = () => {
                     </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {/* Add People */}
                     <div 
                         onClick={handleAddPeopleClick}
                         className="group relative bg-gradient-to-br from-teal-600 to-teal-800 rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer border border-teal-700"
@@ -164,7 +165,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-                    
+                    {/* Scan People */}
                     <div 
                         onClick={handleScanPeopleClick}
                         className="group relative bg-gradient-to-br from-amber-600 to-amber-800 rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer border border-amber-700"
@@ -186,6 +187,33 @@ const Dashboard = () => {
                                 <span className="text-xs uppercase tracking-wider font-semibold text-amber-200">Recognition</span>
                                 <span className="bg-amber-700 px-4 py-2 rounded-lg text-sm font-medium text-white group-hover:bg-amber-600 transition-all duration-300">
                                     Scan Now
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* remove Person */}
+                    <div 
+                        onClick={() => navigate('/remove-people')}
+                        className="group relative bg-gradient-to-br from-rose-600 to-rose-800 rounded-xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer border border-rose-700"
+                    >
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mt-10 -mr-10"></div>
+                        
+                        <div className="p-8">
+                            <div className="mb-6 p-4 bg-rose-500 rounded-full w-16 h-16 flex items-center justify-center">
+                                <FaUserMinus className="text-2xl text-white" />
+                            </div>
+                            
+                            <h3 className="text-2xl font-bold mb-3 text-white">Remove People</h3>
+                            
+                            <p className="text-rose-100 mb-6">
+                                Remove people data from the database.
+                            </p>
+                            
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs uppercase tracking-wider font-semibold text-rose-200">Database Management</span>
+                                <span className="bg-rose-700 px-4 py-2 rounded-lg text-sm font-medium text-white group-hover:bg-rose-600 transition-all duration-300">
+                                    Remove
                                 </span>
                             </div>
                         </div>

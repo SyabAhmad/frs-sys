@@ -10,6 +10,7 @@ import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
 import AddPeople from './components/add-people';
 import ScanPeople from './components/scan-people';
+import RemovePeople from './components/RemovePeople';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Protected Route component
@@ -54,7 +55,7 @@ const AppContent = () => {
   const location = useLocation(); // Hook to get current location
   
   // Update this line to include /scan-people in the hideHeader list
-  const hideHeader = ['/dashboard', '/scan-people', '/add-people'].includes(location.pathname);
+  const hideHeader = ['/dashboard', '/scan-people', '/add-people', "/remove-people"].includes(location.pathname);
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
@@ -104,6 +105,11 @@ const AppContent = () => {
           <Route path="/add-people" element={
             <ProtectedRoute>
               <AddPeople />
+            </ProtectedRoute>
+          } />
+          <Route path="/remove-people" element={
+            <ProtectedRoute>
+              <RemovePeople />
             </ProtectedRoute>
           } />
         </Routes>
