@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserPlus, FaCamera, FaSignOutAlt, FaUserCheck } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Dashboard = () => {
     const navigate = useNavigate();
     const { logout, currentUser } = useAuth();
+    const [people, setPeople] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     
     const handleAddPeopleClick = () => {
         navigate('/add-people');
@@ -19,6 +22,77 @@ const Dashboard = () => {
         logout();
         navigate('/');
     };
+
+    // For person deletion
+    const handleDeletePerson = async (personId, name) => {
+        if (window.confirm(`Are you sure you want to delete ${name}?`)) {
+            try {
+                const response = await fetch(`/api/people/${personId}`, {
+                    method: 'DELETE',
+                });
+                
+                if (response.ok) {
+                    setPeople(people.filter(person => person.id !== personId));
+                    toast.success(`${name} has been removed`, {
+                      icon: "🗑️"
+                    });
+                } else {
+                    const data = await response.json();
+                    toast.error(`Deletion failed: ${data.error}`);
+                }
+            } catch (error) {
+                toast.error(`Error: ${error.message}`);
+            }
+        }
+    };
+
+    // For data loading errors
+    useEffect(() => {
+        const fetchPeople = async () => {
+            setIsLoading(true);
+            try {
+                // Make sure to use the full URL to your API endpoint
+                const response = await fetch('http://localhost:5000/api/people', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                // Check for non-JSON response first
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text);
+                    toast.error('Server returned non-JSON response. Is the API server running?');
+                    return;
+                }
+                
+                // Parse JSON response
+                const data = await response.json();
+                
+                if (response.ok) {
+                    setPeople(data);
+                } else {
+                    toast.error(`Failed to load people data: ${data.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                
+                // Keep error toasts - these are important
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    toast.error('Cannot connect to the API server. Is it running?', {
+                        icon: "🔌"
+                    });
+                } else {
+                    toast.error(`Error loading data: ${error.message}`);
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        
+        fetchPeople();
+    }, []);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
@@ -125,6 +199,18 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
+                
+                {/* Show loading indicator during initial load */}
+                {isLoading ? (
+                    <div className="flex justify-center items-center py-12">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+                    </div>
+                ) : (
+                    /* Rest of your dashboard content */
+                    <div>
+                        {/* Your existing dashboard UI */}
+                    </div>
+                )}
                 
             </div>
         </div>

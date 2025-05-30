@@ -8,7 +8,7 @@ const teamMembers = [
     role: 'Front-end Developer',
     department: '216228 | UOS216022028 | Software Engineering',
     techstack: ['React', 'JavaScript', 'HTML', 'CSS'],
-    imageUrl: '/images/person1.jpg',
+    imageUrl: 'taimor.jpg',
     socials: {
       linkedin: '#',
       twitter: '#',
@@ -21,7 +21,7 @@ const teamMembers = [
     role: 'Back-end Developer',
     department: '216237 | UOS216022037 | Software Engineering',
     techstack: ['Python', 'PostgreSQL', 'Flask', 'Machine Learning'],
-    imageUrl: '/images/person2.jpg',
+    imageUrl: 'faraz.jpg',
     socials: {
       linkedin: '#',
       github: '#',
@@ -47,11 +47,15 @@ const Team = () => {
               key={member.id}
               className="bg-white rounded-xl shadow-xl overflow-hidden transform transition duration-500 hover:scale-105 hover:shadow-2xl flex flex-col"
             >
-              <img
-                src={member.imageUrl}
-                alt={member.name}
-                className="w-full h-64 object-cover object-center"
-              />
+              {/* Modified image container to ensure faces are visible */}
+              <div className="relative h-72 w-full overflow-hidden">
+                <img
+                  src={member.imageUrl}
+                  alt={member.name}
+                  className="absolute w-full h-full object-cover object-top"
+                  // Added object-top to focus on the upper part of the image where faces typically are
+                />
+              </div>
               <div className="p-6 flex-grow flex flex-col">
                 <h3 className="text-2xl font-semibold text-slate-900 mb-1">
                   {member.name}

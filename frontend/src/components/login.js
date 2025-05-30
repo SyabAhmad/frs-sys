@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -31,10 +32,14 @@ const Login = () => {
       }
       
       login(data.user, data.token);
+      toast.success('Logged in successfully!', {
+        icon: "👋"
+      });
       navigate('/dashboard');
       
     } catch (err) {
       setError(err.message);
+      toast.error(`Login failed: ${err.message}`);
     } finally {
       setLoading(false);
     }

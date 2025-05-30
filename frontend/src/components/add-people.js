@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { FaArrowLeft, FaCamera } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 export default function AddPeople() {
   const [formData, setFormData] = useState({
@@ -60,57 +61,46 @@ export default function AddPeople() {
     setFormData(prev => ({ ...prev, faceImage: null }));
   };
 
-  const handleSubmit = (e) => {
+  // For adding a new person
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    setIsSubmitting(true);
     
-    const submitData = async () => {
-      setIsSubmitting(true); 
-      
-      try {
-        const formDataToSend = new FormData();
-        for (const key in formData) {
-          formDataToSend.append(key, formData[key]);
-        }
-
-        const response = await fetch('http://localhost:5000/api/people', {
-          method: 'POST',
-          body: formDataToSend,
-        });
-
-        if (response.ok) {
-          console.log('Data submitted successfully!');
-          setFormData({
-            full_name: '',
-            age: '',
-            department: '',
-            home_address: '',
-            phone_number: '',
-            email: '',
-            occupation: '',
-            education: '',
-            interests: '',
-            hobbies: '',
-            bio: '',
-            faceImage: null
-          });
-          setCapturedImage(null);
-          setShowWebcam(false);
-          alert("Person added successfully! Face encoding has been stored in the database.");
-        } else {
-          const errorData = await response.json();
-          console.error('Failed to submit data:', errorData);
-          alert(`Failed to add person: ${errorData.error || 'Unknown error'}`);
-        }
-      } catch (error) {
-        console.error('Error submitting data:', error);
-        alert("An error occurred during submission. Please try again.");
-      } finally {
-        setIsSubmitting(false);
+    if (!formData.faceImage && !capturedImage) {
+      toast.error("Please provide a face image", {
+        icon: "🖼️"
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    try {
+      const formDataToSend = new FormData();
+      for (const key in formData) {
+        formDataToSend.append(key, formData[key]);
       }
-    };
 
-    submitData();
+      const response = await fetch('/api/people', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        toast.success(`${formData.full_name} has been added successfully!`, {
+          icon: "➕"
+        });
+        // Clear form or navigate
+        navigate('/dashboard');
+      } else {
+        toast.error(`Failed to add person: ${data.error}`);
+      }
+    } catch (error) {
+      toast.error(`Error: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBack = () => {

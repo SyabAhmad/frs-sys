@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 // API call function with more detailed error handling
 const registerUser = async (name, email, password) => {
@@ -112,6 +113,20 @@ const Signup = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+
+  // For registration
+  const handleRegisterSubmit = async (userData) => {
+    try {
+      await registerUser(userData);
+      toast.success('Registration successful! Please log in.', {
+        icon: "✅"
+      });
+      navigate('/login');
+    } catch (error) {
+      toast.error(`Registration failed: ${error.message}`);
     }
   };
 

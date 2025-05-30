@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 import numpy as np
 import face_recognition
 from database import get_db_connection
-from face_utils import process_face_image
+from face_utils import process_image_with_multiple_faces
 from psycopg2.extras import RealDictCursor
 
 scan_bp = Blueprint('scan', __name__)
@@ -18,59 +18,82 @@ def scan_face():
         return jsonify({"error": "No selected face image file"}), 400
 
     try:
-        # Process the face image
+        # Process the image to get multiple face encodings
         image_data = file.read()
-        face_encoding, error = process_face_image(image_data)
+        face_encodings, face_locations, error = process_image_with_multiple_faces(image_data)
         
         if error:
             return jsonify({"error": error}), 400
         
-        # Query the database for matching face
+        if len(face_encodings) == 0:
+            return jsonify({"error": "No faces detected in the image"}), 400
+            
+        # Query the database for matching faces
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
         # Get all people with their face encodings
         cur.execute("SELECT id, full_name, department, email, phone_number, face_embedding FROM people_records")
-        people = cur.fetchall()
+        people_records = cur.fetchall()
         
-        best_match = None
-        best_match_distance = float('inf')
+        # Convert DB face encodings to numpy arrays for comparison
+        stored_encodings = []
+        stored_people = []
         
-        # Compare with each stored face
-        for person in people:
-            # Convert the stored face encoding array back to numpy array
-            stored_encoding = np.array(person["face_embedding"])
-            
-            # Calculate face distance (lower is more similar)
-            face_distance = face_recognition.face_distance([stored_encoding], face_encoding)[0]
-            
-            # Update best match if this is better
-            if face_distance < best_match_distance:
-                best_match_distance = face_distance
-                best_match = person
+        for person in people_records:
+            stored_encodings.append(np.array(person["face_embedding"]))
+            stored_people.append(person)
+        
+        # List to hold all recognized faces
+        recognized_faces = []
         
         # Define a confidence threshold (lower distance = higher confidence)
         threshold = 0.6  # Adjust based on your needs
         
-        if best_match is not None and best_match_distance < threshold:
-            # Calculate a confidence score (1.0 = perfect match)
-            confidence = 1 - best_match_distance
-            
-            # Return the match
-            return jsonify({
-                "id": best_match["id"],
-                "full_name": best_match["full_name"],
-                "department": best_match["department"],
-                "email": best_match["email"],
-                "phone_number": best_match["phone_number"],
-                "confidence": confidence
-            }), 200
+        # For each detected face
+        for i, face_encoding in enumerate(face_encodings):
+            # Calculate all distances
+            if stored_encodings:  # Check if there are any stored encodings
+                face_distances = face_recognition.face_distance(stored_encodings, face_encoding)
+                
+                # Find the best match (minimum distance)
+                best_match_index = np.argmin(face_distances)
+                best_match_distance = face_distances[best_match_index]
+                
+                # If the match is good enough
+                if best_match_distance < threshold:
+                    # Calculate confidence score
+                    confidence = 1 - best_match_distance
+                    best_match = stored_people[best_match_index]
+                    
+                    # Add location information for UI positioning
+                    top, right, bottom, left = face_locations[i]
+                    
+                    # Add this person to the results with default values for NULL
+                    recognized_faces.append({
+                        "id": best_match["id"],
+                        "full_name": best_match["full_name"] or "",
+                        "department": best_match["department"] or "",
+                        "email": best_match["email"] or "",
+                        "phone_number": best_match["phone_number"] or "",
+                        "confidence": float(confidence),  # Ensure it's a float
+                        "face_location": {
+                            "top": int(top),
+                            "right": int(right),
+                            "bottom": int(bottom),
+                            "left": int(left)
+                        }
+                    })
+        
+        # Return the results
+        if recognized_faces:
+            return jsonify(recognized_faces), 200
         else:
-            return jsonify({"error": "No matching person found"}), 404
+            return jsonify({"error": "No matching faces found in database"}), 404
             
     except Exception as e:
-        current_app.logger.error(f"Error scanning face: {e}")
-        return jsonify({"error": "An error occurred during face scanning"}), 500
+        current_app.logger.error(f"Error scanning faces: {e}")
+        return jsonify({"error": f"An error occurred during face scanning: {str(e)}"}), 500
     finally:
         if 'conn' in locals() and conn:
             cur.close()

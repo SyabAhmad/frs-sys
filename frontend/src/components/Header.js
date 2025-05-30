@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaSignInAlt, FaUserPlus, FaTachometerAlt, FaSignOutAlt, FaBars, FaTimes, FaHome, FaInfoCircle, FaUsers, FaEnvelope, FaCogs, FaCamera } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Header = ({ scrollToSection }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,9 +16,11 @@ const Header = ({ scrollToSection }) => {
 
   const handleScanFace = () => {
     if (isAuthenticated) {
-      navigate('/scan');
+      navigate('/scan-people');
     } else {
-      alert('Please log in to scan a face.');
+      toast.info('Please log in to scan a face.', {
+        icon: "🔒"
+      });
       navigate('/login');
     }
     setIsMenuOpen(false);
@@ -48,6 +51,7 @@ const Header = ({ scrollToSection }) => {
   const handleLogout = (e) => {
     e.preventDefault();
     logout();
+    toast.success('Logged out successfully!');
     navigate('/');
     setIsMenuOpen(false);
   };

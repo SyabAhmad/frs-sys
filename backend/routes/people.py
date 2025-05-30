@@ -1,87 +1,121 @@
 from flask import Blueprint, request, jsonify, current_app
-import psycopg2
 from database import get_db_connection
 from face_utils import process_face_image
+import json
+import psycopg2.extras
+from psycopg2.extras import RealDictCursor
 
 people_bp = Blueprint('people', __name__)
 
-@people_bp.route('/api/people', methods=['POST'])
-def add_people_record():
-    # --- Form Data ---
-    full_name = request.form.get('full_name')
-    age_str = request.form.get('age')
-    department = request.form.get('department')
-    home_address = request.form.get('home_address')
-    phone_number = request.form.get('phone_number')
-    email = request.form.get('email')
-    occupation = request.form.get('occupation')
-    education = request.form.get('education')
-    interests = request.form.get('interests')
-    hobbies = request.form.get('hobbies')
-    bio = request.form.get('bio')
-
-    # --- File Data ---
-    if 'faceImage' not in request.files:
-        return jsonify({"error": "No face image part in the request"}), 400
-    
-    file = request.files['faceImage']
-
-    if file.filename == '':
-        return jsonify({"error": "No selected face image file"}), 400
-
-    # --- Validations ---
-    if not full_name:
-        return jsonify({"error": "Full name is required"}), 400
-    
-    age = None
-    if age_str:
-        try:
-            age = int(age_str)
-        except ValueError:
-            return jsonify({"error": "Invalid age format"}), 400
-
-    conn = None
+# Add this new GET route to retrieve people data
+@people_bp.route('/api/people', methods=['GET'])
+def get_people():
     try:
-        # Process the face image
+        # Connect to database
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        
+        # Get all people records
+        cursor.execute("""
+            SELECT id, full_name, department, email, phone_number, 
+                   age, home_address, occupation, education, 
+                   interests, hobbies, bio, created_at
+            FROM people_records
+            ORDER BY full_name
+        """)
+        
+        people = cursor.fetchall()
+        
+        # Convert any datetime objects to strings for JSON serialization
+        for person in people:
+            if person.get('created_at'):
+                person['created_at'] = person['created_at'].isoformat()
+        
+        return jsonify(people), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Error retrieving people records: {e}")
+        return jsonify({"error": f"Failed to retrieve people: {str(e)}"}), 500
+    finally:
+        if 'conn' in locals() and conn:
+            cursor.close()
+            conn.close()
+
+# Your existing POST route for adding people
+@people_bp.route('/api/people', methods=['POST'])
+def add_person():
+    # Check if the image is in the request
+    if 'faceImage' not in request.files:
+        return jsonify({"error": "No face image provided"}), 400
+    # full_name: '',
+    # age: '',
+    # department: '',
+    # home_address: '',
+    # phone_number: '',
+    # email: '',
+    # occupation: '',
+    # education: '',
+    # interests: '',
+    # hobbies: '',
+    # bio: '',
+    # Extract form data
+    full_name = request.form.get('full_name', '')
+    department = request.form.get('department', '')
+    email = request.form.get('email', '')
+    phone_number = request.form.get('phone_number', '')
+    age = request.form.get('age', '')
+    home_address = request.form.get('home_address', '')
+    occupation = request.form.get('occupation', '')
+    education = request.form.get('education', '')
+    interests = request.form.get('interests', '')
+    hobbies = request.form.get('hobbies', '')
+    bio = request.form.get('bio', '')
+
+
+
+    # Get the image file
+    file = request.files['faceImage']
+    
+    try:
+        # Process the image to extract face encoding
         image_data = file.read()
         face_encoding, error = process_face_image(image_data)
         
         if error:
             return jsonify({"error": error}), 400
         
-        # For double precision array in PostgreSQL, we need to convert the encoding to a list
-        face_encoding_list = face_encoding.tolist()
+        if not face_encoding:
+            return jsonify({"error": "Failed to extract face features"}), 400
         
+        # Connect to database
         conn = get_db_connection()
-        cur = conn.cursor()
+        cursor = conn.cursor()
         
-        # Update to use the correct table and column name
-        cur.execute(
-            """
-            INSERT INTO people_records (
-                full_name, age, department, home_address, phone_number, email,
-                occupation, education, interests, hobbies, bio, face_embedding
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
-            """,
-            (
-                full_name, age, department, home_address, phone_number, email,
-                occupation, education, interests, hobbies, bio, face_encoding_list
-            )
+        # Store the face embedding as a proper PostgreSQL array
+        # Use psycopg2's adapt function to format it correctly
+        if hasattr(face_encoding, 'tolist'):
+            face_encoding = face_encoding.tolist()
+            
+        # Use psycopg2's adaptation for arrays
+        face_embedding_adapted = psycopg2.extensions.adapt(face_encoding)
+                # Insert the person record
+        cursor.execute(
+            "INSERT INTO people_records (full_name, department, email, phone_number, face_embedding, age, home_address, occupation, education, interests, hobbies, bio) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id",
+            (full_name, department, email, phone_number, face_embedding_adapted, age, home_address, occupation, education, interests, hobbies, bio)
         )
-        person_id = cur.fetchone()[0]
+        
+        new_person_id = cursor.fetchone()[0]
         conn.commit()
         
         return jsonify({
-            "message": "Person record and face encoding added successfully!", 
-            "person_id": person_id
+            "id": new_person_id,
+            "message": "Person added successfully"
         }), 201
-
+        
     except Exception as e:
-        if conn:
-            conn.rollback()
         current_app.logger.error(f"Error adding person record: {e}")
-        return jsonify({"error": "Failed to add person record", "details": str(e)}), 500
+        return jsonify({"error": f"Failed to add person: {str(e)}"}), 500
     finally:
-        if conn:
-            cur.close()
+        if 'conn' in locals():
+            cursor.close()
             conn.close()
