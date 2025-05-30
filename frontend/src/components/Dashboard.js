@@ -98,7 +98,8 @@ const Dashboard = () => {
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
             <div className="container mx-auto px-6 py-8">
                 <div className="flex justify-between items-center mb-12">
-                    <div className="flex items-center space-x-3">
+                    <div>
+                        <div className="flex items-center space-x-3">
                         <div className="h-12 w-12 rounded-full bg-teal-500 flex items-center justify-center">
                             <FaUserCheck className="text-2xl text-white" />
                         </div>
@@ -109,24 +110,25 @@ const Dashboard = () => {
                             )}
                         </div>
                     </div>
+                    </div>
                     
                     {/* here we will add a link to home, as it is a navbar */}
-                    <div className="flex space-x-4">
+                    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-4 sm:mt-0">
                         <button 
-                        onClick={() => navigate('/')}
-                        className="flex items-center space-x-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-                    >
-                        <FaHome />
-                        <span>Home</span>
-                    </button>
+                            onClick={() => navigate('/')}
+                            className="flex items-center justify-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto"
+                        >
+                            <FaHome />
+                            <span>Home</span>
+                        </button>
 
-                    <button 
-                        onClick={handleLogout}
-                        className="flex items-center space-x-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-                    >
-                        <FaSignOutAlt />
-                        <span>Logout</span>
-                    </button>
+                        <button 
+                            onClick={handleLogout}
+                            className="flex items-center justify-center space-x-2 px-4 py-2 sm:px-6 sm:py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl w-full sm:w-auto"
+                        >
+                            <FaSignOutAlt />
+                            <span>Logout</span>
+                        </button>
                     </div>
                     
                 </div>
