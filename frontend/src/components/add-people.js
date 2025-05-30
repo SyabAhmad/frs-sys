@@ -80,7 +80,7 @@ export default function AddPeople() {
         formDataToSend.append(key, formData[key]);
       }
 
-      const response = await fetch('/api/people', {
+      const response = await fetch('http://localhost:5000/api/people', {
         method: 'POST',
         body: formDataToSend,
       });
