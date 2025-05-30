@@ -101,19 +101,19 @@ export default function ScanPeople() {
       
       if (scanResponse.ok) {
         // If faces were recognized
-        if (data.length > 0 || data.recognized_people?.length > 0) {
-          toast.success(`${Array.isArray(data) ? data.length : 1} person(s) recognized!`, {
-            icon: "👤"
-          });
-        }
+        // if (data.length > 0 || data.recognized_people?.length > 0) {
+        //   toast.success(`${Array.isArray(data) ? data.length : 1} person(s) recognized!`, {
+        //     icon: "👤"
+        //   });
+        // }
         return { success: true, data: Array.isArray(data) ? data[0] : data };
       } else {
         const errorMsg = data.error || 'Failed to recognize face';
-        toast.warn(errorMsg);
+        // toast.warn(errorMsg);
         return { success: false, error: errorMsg };
       }
     } catch (error) {
-      toast.error('An error occurred during face scanning');
+      // toast.error('An error occurred during face scanning');
       console.error('Error during face scanning:', error);
       const errorMsg = 'An error occurred during face scanning';
       setScanError(errorMsg);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUserPlus, FaCamera, FaSignOutAlt, FaUserCheck } from 'react-icons/fa';
+import { FaUserPlus, FaCamera, FaSignOutAlt, FaUserCheck, FaHome } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
@@ -27,7 +27,7 @@ const Dashboard = () => {
     const handleDeletePerson = async (personId, name) => {
         if (window.confirm(`Are you sure you want to delete ${name}?`)) {
             try {
-                const response = await fetch(`/api/people/${personId}`, {
+                const response = await fetch(`http://localhost:5000/api/people/${personId}`, {
                     method: 'DELETE',
                 });
                 
@@ -110,6 +110,16 @@ const Dashboard = () => {
                         </div>
                     </div>
                     
+                    {/* here we will add a link to home, as it is a navbar */}
+                    <div className="flex space-x-4">
+                        <button 
+                        onClick={() => navigate('/')}
+                        className="flex items-center space-x-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                        <FaHome />
+                        <span>Home</span>
+                    </button>
+
                     <button 
                         onClick={handleLogout}
                         className="flex items-center space-x-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
@@ -117,6 +127,8 @@ const Dashboard = () => {
                         <FaSignOutAlt />
                         <span>Logout</span>
                     </button>
+                    </div>
+                    
                 </div>
                 
                 <div className="mb-12 bg-slate-800 rounded-xl p-6 shadow-xl border border-slate-700">
